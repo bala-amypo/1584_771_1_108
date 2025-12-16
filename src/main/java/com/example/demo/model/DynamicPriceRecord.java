@@ -1,4 +1,6 @@
 package com.example.demo.model;
+import java.time.LocalDateTime;
+
 public class DynamicPriceRecord{
     private long id;
     private long eventId;
