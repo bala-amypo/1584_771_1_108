@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.example.demo.model.DynamicPriceRecord;
 
-public interface DynamicPriceEngineService {
+public interface DynamicPricingEngineService {
     DynamicPriceRecord computeDynamicPrice(Long eventId); 
     List<DynamicPriceRecord> getPriceHistory(Long eventId); 
     DynamicPriceRecord getLatestPrice(Long eventId); 

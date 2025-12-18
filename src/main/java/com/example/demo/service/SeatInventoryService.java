@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.example.demo.model.SeatInventoryRecord;
 
-public interface SeatInventoryRecordService {
+public interface SeatInventoryService {
     SeatInventoryRecord createInventory(SeatInventoryRecord inventory); 
     SeatInventoryRecord updateRemainingSeats(Long eventId, Integer remainingSeats); 
     SeatInventoryRecord getInventoryByEvent(Long eventId);
