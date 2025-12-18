@@ -1,46 +1,48 @@
 package com.example.demo.model;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "seat_inventory_records")
 public class SeatInventoryRecord {
-    private long id;
-    private long eventId;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private Long eventId;
+
+    @Column(nullable = false)
     private Integer totalSeats;
+
+    @Column(nullable = false)
     private Integer remainingSeats;
+
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    public SeatInventoryRecord(long eventId, Integer totalSeats, Integer remainingSeats, LocalDateTime updatedAt) {
+    public SeatInventoryRecord() {}
+
+    public SeatInventoryRecord(Long eventId, Integer totalSeats, Integer remainingSeats, LocalDateTime updatedAt) {
         this.eventId = eventId;
         this.totalSeats = totalSeats;
         this.remainingSeats = remainingSeats;
         this.updatedAt = updatedAt;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    @PrePersist
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 
-    public void setEventId(long eventId) {
-        this.eventId = eventId;
-    }
-
-    public void setTotalSeats(Integer totalSeats) {
-        this.totalSeats = totalSeats;
-    }
-
-    public void setRemainingSeats(Integer remainingSeats) {
-        this.remainingSeats = remainingSeats;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public long getEventId() {
+    public Long getEventId() {
         return eventId;
     }
 
@@ -56,4 +58,23 @@ public class SeatInventoryRecord {
         return updatedAt;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
+    }
+
+    public void setTotalSeats(Integer totalSeats) {
+        this.totalSeats = totalSeats;
+    }
+
+    public void setRemainingSeats(Integer remainingSeats) {
+        this.remainingSeats = remainingSeats;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }
