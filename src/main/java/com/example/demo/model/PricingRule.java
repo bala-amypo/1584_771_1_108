@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "pricing_rules", uniqueConstraints = @UniqueConstraint(columnNames = "ruleCode"))
@@ -33,25 +34,15 @@ public class PricingRule {
 
     public PricingRule() {}
 
-    public PricingRule(String ruleCode, String description, Integer minRemainingSeats, Integer maxRemainingSeats,
-                       Integer daysBeforeEvent, Double priceMultiplier, Boolean active) {
-        this.ruleCode = ruleCode;
-        this.description = description;
-        this.minRemainingSeats = minRemainingSeats;
-        this.maxRemainingSeats = maxRemainingSeats;
-        this.daysBeforeEvent = daysBeforeEvent;
-        this.priceMultiplier = priceMultiplier;
-        this.active = active;
+    public boolean appliesTo(Integer remainingSeats, LocalDate eventDate) {
+        return active &&
+               remainingSeats >= minRemainingSeats &&
+               remainingSeats <= maxRemainingSeats &&
+               eventDate != null &&
+               java.time.LocalDate.now().until(eventDate).getDays() >= daysBeforeEvent;
     }
 
-    @PrePersist
-    @PreUpdate
-    protected void validateMultiplier() {
-        if (priceMultiplier == null || priceMultiplier <= 0) {
-            throw new IllegalArgumentException("priceMultiplier must be greater than 0");
-        }
-    }
-
+    // Getters
     public Long getId() {
         return id;
     }
@@ -84,6 +75,7 @@ public class PricingRule {
         return active;
     }
 
+    // Setters
     public void setId(Long id) {
         this.id = id;
     }
