@@ -11,6 +11,7 @@ public class SeatInventoryRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Reference to EventRecord (foreign key)
     @Column(nullable = false)
     private Long eventId;
 
@@ -23,21 +24,27 @@ public class SeatInventoryRecord {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    // Default constructor required by JPA
     public SeatInventoryRecord() {}
 
-    public SeatInventoryRecord(Long eventId, Integer totalSeats, Integer remainingSeats, LocalDateTime updatedAt) {
+    // Convenience constructor (without updatedAt, since it's auto-set)
+    public SeatInventoryRecord(Long eventId, Integer totalSeats, Integer remainingSeats) {
         this.eventId = eventId;
         this.totalSeats = totalSeats;
         this.remainingSeats = remainingSeats;
-        this.updatedAt = updatedAt;
     }
 
+    // Lifecycle hooks to auto-set updatedAt and validate seat counts
     @PrePersist
     @PreUpdate
-    protected void onUpdate() {
+    protected void validateAndUpdate() {
+        if (remainingSeats != null && totalSeats != null && remainingSeats > totalSeats) {
+            throw new IllegalArgumentException("Remaining seats cannot exceed total seats");
+        }
         this.updatedAt = LocalDateTime.now();
     }
 
+    // Getters
     public Long getId() {
         return id;
     }
@@ -58,6 +65,7 @@ public class SeatInventoryRecord {
         return updatedAt;
     }
 
+    // Setters
     public void setId(Long id) {
         this.id = id;
     }
