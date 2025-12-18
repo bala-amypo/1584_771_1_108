@@ -18,7 +18,7 @@ public class DynamicPriceRecord {
     private Double computedPrice;
 
     @Column(nullable = false)
-    private String appliedRuleCodes; 
+    private String appliedRuleCodes;
 
     @Column(nullable = false)
     private LocalDateTime computedAt;
@@ -39,43 +39,16 @@ public class DynamicPriceRecord {
         this.computedAt = LocalDateTime.now();
     }
 
-    public Long getId() {
-        return id;
-    }
+   
+    public Long getId() { return id; }
+    public Long getEventId() { return eventId; }
+    public Double getComputedPrice() { return computedPrice; }
+    public String getAppliedRuleCodes() { return appliedRuleCodes; }
+    public LocalDateTime getComputedAt() { return computedAt; }
 
-    public Long getEventId() {
-        return eventId;
-    }
-
-    public Double getComputedPrice() {
-        return computedPrice;
-    }
-
-    public String getAppliedRuleCodes() {
-        return appliedRuleCodes;
-    }
-
-    public LocalDateTime getComputedAt() {
-        return computedAt;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setEventId(Long eventId) {
-        this.eventId = eventId;
-    }
-
-    public void setComputedPrice(Double computedPrice) {
-        this.computedPrice = computedPrice;
-    }
-
-    public void setAppliedRuleCodes(String appliedRuleCodes) {
-        this.appliedRuleCodes = appliedRuleCodes;
-    }
-
-    public void setComputedAt(LocalDateTime computedAt) {
-        this.computedAt = computedAt;
-    }
+    public void setId(Long id) { this.id = id; }
+    public void setEventId(Long eventId) { this.eventId = eventId; }
+    public void setComputedPrice(Double computedPrice) { this.computedPrice = computedPrice; }
+    public void setAppliedRuleCodes(String appliedRuleCodes) { this.appliedRuleCodes = appliedRuleCodes; }
+    public void setComputedAt(LocalDateTime computedAt) { this.computedAt = computedAt; }
 }

@@ -1,7 +1,7 @@
 package com.example.demo.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.stereotype.Service;
 
 import com.example.demo.model.DynamicPriceRecord;
@@ -50,18 +50,26 @@ public class DynamicPricingEngineServiceImpl implements DynamicPricingEngineServ
 
         List<PricingRule> rules = ruleRepo.findByActiveTrue();
         double price = event.getBasePrice();
+        List<String> appliedCodes = new ArrayList<>();
 
         for (PricingRule rule : rules) {
             if (rule.appliesTo(inventory.getRemainingSeats(), event.getEventDate())) {
                 price *= rule.getPriceMultiplier();
+                appliedCodes.add(rule.getRuleCode());
             }
         }
 
-        DynamicPriceRecord latest = priceRepo.findTopByEventIdOrderByTimestampDesc(eventId);
-        if (latest == null || latest.getComputedPrice() != price) {
-            DynamicPriceRecord newRecord = new DynamicPriceRecord(eventId, price, null);
+        String appliedRuleCodes = String.join(",", appliedCodes);
+
+        DynamicPriceRecord latest = priceRepo.findTopByEventIdOrderByComputedAtDesc(eventId);
+        if (latest == null || !latest.getComputedPrice().equals(price)) {
+            DynamicPriceRecord newRecord = new DynamicPriceRecord(eventId, price, appliedRuleCodes);
             priceRepo.save(newRecord);
-            logRepo.save(new PriceAdjustmentLog(eventId, latest != null ? latest.getComputedPrice() : price, price, null, null));
+            logRepo.save(new PriceAdjustmentLog(eventId,
+                                                latest != null ? latest.getComputedPrice() : event.getBasePrice(),
+                                                price,
+                                                appliedRuleCodes,
+                                                null));
             return newRecord;
         }
 
@@ -70,12 +78,12 @@ public class DynamicPricingEngineServiceImpl implements DynamicPricingEngineServ
 
     @Override
     public List<DynamicPriceRecord> getPriceHistory(Long eventId) {
-        return priceRepo.findByEventIdOrderByTimestampDesc(eventId);
+        return priceRepo.findByEventIdOrderByComputedAtDesc(eventId);
     }
 
     @Override
     public DynamicPriceRecord getLatestPrice(Long eventId) {
-        return priceRepo.findTopByEventIdOrderByTimestampDesc(eventId);
+        return priceRepo.findTopByEventIdOrderByComputedAtDesc(eventId);
     }
 
     @Override
