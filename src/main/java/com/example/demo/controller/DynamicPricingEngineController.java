@@ -9,11 +9,11 @@ import com.example.demo.service.DynamicPricingEngineService;
 
 @RestController
 @RequestMapping("/pricing")
-public class DynamicPricingEngineController {
+public class DynamicPricingController {
 
     private final DynamicPricingEngineService service;
 
-    public DynamicPricingEngineController(DynamicPricingEngineService service) {
+    public DynamicPricingController(DynamicPricingEngineService service) {
         this.service = service;
     }
 
