@@ -6,13 +6,13 @@ import java.util.*;
 
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final Map<String, Map<String, Object>> users = new HashMap<>();
+    private final Map<String, Map<String,Object>> users = new HashMap<>();
     private long seq = 1;
 
-    public Map<String, Object> registerUser(
+    public Map<String,Object> registerUser(
             String fullName, String email, String password, String role) {
 
-        Map<String, Object> u = new HashMap<>();
+        Map<String,Object> u = new HashMap<>();
         u.put("userId", seq++);
         u.put("email", email);
         u.put("password", password);
@@ -24,6 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email)
             throws UsernameNotFoundException {
+
         if (!users.containsKey(email))
             throw new UsernameNotFoundException("User not found");
 

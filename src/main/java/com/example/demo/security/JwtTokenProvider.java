@@ -1,45 +1,40 @@
 package com.example.demo.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.springframework.security.core.Authentication;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class JwtTokenProvider {
 
     private final String secret;
-    private final long validityInMs;
+    private final long validity;
 
-    public JwtTokenProvider(String secret, long validityInMs, boolean ignored) {
+    public JwtTokenProvider(String secret, long validity, boolean ignored) {
         this.secret = secret;
-        this.validityInMs = validityInMs;
+        this.validity = validity;
     }
 
-    public String generateToken(
-            Authentication authentication,
-            Long userId,
-            String role) {
+    public String generateToken(Authentication auth,
+                                Long userId,
+                                String role) {
 
-        Map<String, Object> claims = new HashMap<>();
+        Map<String,Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("role", role);
-        claims.put("email", authentication.getName());
+        claims.put("email", auth.getName());
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(authentication.getName())
-                .setExpiration(new Date(System.currentTimeMillis() + validityInMs))
+                .setSubject(auth.getName())
+                .setExpiration(new Date(System.currentTimeMillis()+validity))
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
+            Jwts.parser().setSigningKey(secret)
+                    .parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             return false;
@@ -50,11 +45,11 @@ public class JwtTokenProvider {
         return (String) getAllClaims(token).get("email");
     }
 
-    public Map<String, Object> getAllClaims(String token) {
-        Claims claims = Jwts.parser()
+    public Map<String,Object> getAllClaims(String token) {
+        Claims c = Jwts.parser()
                 .setSigningKey(secret)
                 .parseClaimsJws(token)
                 .getBody();
-        return new HashMap<>(claims);
+        return new HashMap<>(c);
     }
 }
