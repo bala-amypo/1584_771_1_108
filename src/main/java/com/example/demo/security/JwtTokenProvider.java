@@ -1,32 +1,38 @@
 package com.example.demo.security;
 
-import io.jsonwebtoken.*;
-import java.util.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.security.core.Authentication;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class JwtTokenProvider {
 
     private final String secret;
-    private final long validity;
+    private final long validityInMs;
 
-    public JwtTokenProvider(String secret, long validity, boolean ignored) {
+    public JwtTokenProvider(String secret, long validityInMs, boolean ignored) {
         this.secret = secret;
-        this.validity = validity;
+        this.validityInMs = validityInMs;
     }
 
     public String generateToken(
-            org.springframework.security.core.Authentication auth,
+            Authentication authentication,
             Long userId,
             String role) {
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("role", role);
-        claims.put("email", auth.getName());
+        claims.put("email", authentication.getName());
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(auth.getName())
-                .setExpiration(new Date(System.currentTimeMillis() + validity))
+                .setSubject(authentication.getName())
+                .setExpiration(new Date(System.currentTimeMillis() + validityInMs))
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
     }
@@ -41,14 +47,14 @@ public class JwtTokenProvider {
     }
 
     public String getUsernameFromToken(String token) {
-        return getAllClaims(token).get("email", String.class);
+        return (String) getAllClaims(token).get("email");
     }
 
     public Map<String, Object> getAllClaims(String token) {
-        Claims c = Jwts.parser()
+        Claims claims = Jwts.parser()
                 .setSigningKey(secret)
                 .parseClaimsJws(token)
                 .getBody();
-        return new HashMap<>(c);
+        return new HashMap<>(claims);
     }
 }
