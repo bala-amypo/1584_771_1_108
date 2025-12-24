@@ -1,14 +1,13 @@
 package com.example.demo.service.impl;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
+import com.example.demo.exception.BadRequestException;
 import com.example.demo.model.PricingRule;
 import com.example.demo.repository.PricingRuleRepository;
 import com.example.demo.service.PricingRuleService;
 
-@Service
+import java.util.List;
+import java.util.Optional;
+
 public class PricingRuleServiceImpl implements PricingRuleService {
 
     private final PricingRuleRepository repository;
@@ -19,9 +18,12 @@ public class PricingRuleServiceImpl implements PricingRuleService {
 
     @Override
     public PricingRule createRule(PricingRule rule) {
-        if (rule.getPriceMultiplier() <= 0) {
-            throw new IllegalArgumentException("Invalid multiplier");
-        }
+        if (repository.existsByRuleCode(rule.getRuleCode()))
+            throw new BadRequestException("Price multiplier must be > 0");
+
+        if (rule.getPriceMultiplier() == null || rule.getPriceMultiplier() <= 0)
+            throw new BadRequestException("Price multiplier must be > 0");
+
         return repository.save(rule);
     }
 
@@ -32,13 +34,13 @@ public class PricingRuleServiceImpl implements PricingRuleService {
     }
 
     @Override
-    public List<PricingRule> getActiveRules() {
-        return repository.findByActiveTrue();
+    public Optional<PricingRule> getRuleByCode(String ruleCode) {
+        return repository.findByRuleCode(ruleCode);
     }
 
     @Override
-    public PricingRule getRuleByCode(String ruleCode) {
-        return repository.findByRuleCode(ruleCode);
+    public List<PricingRule> getActiveRules() {
+        return repository.findByActiveTrue();
     }
 
     @Override
