@@ -17,7 +17,6 @@ public class PricingRule {
     private Double priceMultiplier;
     private Boolean active;
 
-    // getters & setters
     public String getRuleCode() { return ruleCode; }
     public void setRuleCode(String ruleCode) { this.ruleCode = ruleCode; }
 

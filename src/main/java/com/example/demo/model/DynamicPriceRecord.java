@@ -20,7 +20,6 @@ public class DynamicPriceRecord {
         computedAt = LocalDateTime.now();
     }
 
-    // getters & setters
     public Long getEventId() { return eventId; }
     public void setEventId(Long eventId) { this.eventId = eventId; }
 
