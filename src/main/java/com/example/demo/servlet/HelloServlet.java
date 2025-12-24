@@ -8,6 +8,7 @@ public class HelloServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
         resp.setContentType("text/plain");
-        resp.getWriter().write("Hello from Dynamic Event Ticket Pricing Servlet");
+        resp.getWriter()
+            .write("Hello from Dynamic Event Ticket Pricing Servlet");
     }
 }
