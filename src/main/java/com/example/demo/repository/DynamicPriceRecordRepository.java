@@ -1,10 +1,16 @@
 package com.example.demo.repository;
 
-import java.util.List;
-import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.demo.model.DynamicPriceRecord;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface DynamicPriceRecordRepository extends JpaRepository<DynamicPriceRecord, Long> {
+import java.util.List;
+import java.util.Optional;
+
+public interface DynamicPriceRecordRepository
+        extends JpaRepository<DynamicPriceRecord, Long> {
+
     List<DynamicPriceRecord> findByEventIdOrderByComputedAtDesc(Long eventId);
-    DynamicPriceRecord findTopByEventIdOrderByComputedAtDesc(Long eventId);
+
+    Optional<DynamicPriceRecord>
+    findFirstByEventIdOrderByComputedAtDesc(Long eventId);
 }
