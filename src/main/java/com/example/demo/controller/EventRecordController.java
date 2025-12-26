@@ -3,10 +3,10 @@ package com.example.demo.controller;
 import com.example.demo.model.EventRecord;
 import com.example.demo.service.EventRecordService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/events")
@@ -20,30 +20,29 @@ public class EventRecordController {
     }
 
     @PostMapping
-    public EventRecord createEvent(@RequestBody EventRecord event) {
-        return service.createEvent(event);
-    }
-
-    @GetMapping
-    public List<EventRecord> getAllEvents() {
-        return service.getAllEvents();
+    public ResponseEntity<EventRecord> create(@RequestBody EventRecord event) {
+        return ResponseEntity.ok(service.create(event));
     }
 
     @GetMapping("/{id}")
-    public EventRecord getEventById(@PathVariable Long id) {
-        return service.getEventById(id);
+    public ResponseEntity<EventRecord> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getById(id));
     }
 
-    @GetMapping("/code/{code}")
-    public Optional<EventRecord> getByCode(@PathVariable String code) {
-        return service.getEventByCode(code);
+    @GetMapping
+    public ResponseEntity<List<EventRecord>> getAll() {
+        return ResponseEntity.ok(service.getAll());
     }
 
     @PutMapping("/{id}/status")
-    public EventRecord updateStatus(
+    public ResponseEntity<EventRecord> updateStatus(
             @PathVariable Long id,
-            @RequestParam boolean active
-    ) {
-        return service.updateEventStatus(id, active);
+            @RequestParam boolean active) {
+        return ResponseEntity.ok(service.updateStatus(id, active));
+    }
+
+    @GetMapping("/lookup/{eventCode}")
+    public ResponseEntity<EventRecord> lookupByCode(@PathVariable String eventCode) {
+        return ResponseEntity.ok(service.findByCode(eventCode));
     }
 }

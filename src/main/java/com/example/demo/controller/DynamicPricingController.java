@@ -1,14 +1,15 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.DynamicPriceRecord;
+import com.example.demo.model.PriceAdjustmentLog;
 import com.example.demo.service.DynamicPricingEngineService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/pricing")
+@RequestMapping("/api/dynamic-pricing")
 @SecurityRequirement(name = "bearerAuth")
 public class DynamicPricingController {
 
@@ -19,17 +20,24 @@ public class DynamicPricingController {
     }
 
     @PostMapping("/compute/{eventId}")
-    public DynamicPriceRecord compute(@PathVariable Long eventId) {
-        return service.computeDynamicPrice(eventId);
+    public ResponseEntity<Double> compute(@PathVariable Long eventId) {
+        return ResponseEntity.ok(service.computePrice(eventId));
+    }
+
+    @GetMapping("/latest/{eventId}")
+    public ResponseEntity<PriceAdjustmentLog> getLatest(
+            @PathVariable Long eventId) {
+        return ResponseEntity.ok(service.getLatest(eventId));
     }
 
     @GetMapping("/history/{eventId}")
-    public List<DynamicPriceRecord> history(@PathVariable Long eventId) {
-        return service.getPriceHistory(eventId);
+    public ResponseEntity<List<PriceAdjustmentLog>> getHistory(
+            @PathVariable Long eventId) {
+        return ResponseEntity.ok(service.getHistory(eventId));
     }
 
-    @GetMapping("/all")
-    public List<DynamicPriceRecord> allPrices() {
-        return service.getAllComputedPrices();
+    @GetMapping
+    public ResponseEntity<List<PriceAdjustmentLog>> getAll() {
+        return ResponseEntity.ok(service.getAll());
     }
 }
