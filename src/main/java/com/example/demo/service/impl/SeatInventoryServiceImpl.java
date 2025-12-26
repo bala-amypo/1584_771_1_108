@@ -7,7 +7,6 @@ import com.example.demo.repository.SeatInventoryRecordRepository;
 import com.example.demo.service.SeatInventoryService;
 
 import java.util.List;
-import java.util.Optional;
 
 public class SeatInventoryServiceImpl implements SeatInventoryService {
 
@@ -46,8 +45,8 @@ public class SeatInventoryServiceImpl implements SeatInventoryService {
     }
 
     @Override
-    public Optional<SeatInventoryRecord> getInventoryByEvent(Long eventId) {
-        return inventoryRepo.findByEventId(eventId);
+    public SeatInventoryRecord getInventoryByEvent(Long eventId) {
+        return inventoryRepo.findByEventId(eventId).orElseThrow();
     }
 
     @Override

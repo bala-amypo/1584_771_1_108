@@ -6,7 +6,6 @@ import com.example.demo.repository.PricingRuleRepository;
 import com.example.demo.service.PricingRuleService;
 
 import java.util.List;
-import java.util.Optional;
 
 public class PricingRuleServiceImpl implements PricingRuleService {
 
@@ -18,6 +17,7 @@ public class PricingRuleServiceImpl implements PricingRuleService {
 
     @Override
     public PricingRule createRule(PricingRule rule) {
+
         if (repository.existsByRuleCode(rule.getRuleCode()))
             throw new BadRequestException("Price multiplier must be > 0");
 
@@ -34,8 +34,8 @@ public class PricingRuleServiceImpl implements PricingRuleService {
     }
 
     @Override
-    public Optional<PricingRule> getRuleByCode(String ruleCode) {
-        return repository.findByRuleCode(ruleCode);
+    public PricingRule getRuleByCode(String ruleCode) {
+        return repository.findByRuleCode(ruleCode).orElse(null);
     }
 
     @Override
