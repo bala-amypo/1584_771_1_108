@@ -1,29 +1,33 @@
+// src/main/java/com/example/demo/service/impl/PriceAdjustmentLogServiceImpl.java
 package com.example.demo.service.impl;
 
 import com.example.demo.model.PriceAdjustmentLog;
 import com.example.demo.repository.PriceAdjustmentLogRepository;
 import com.example.demo.service.PriceAdjustmentLogService;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
 public class PriceAdjustmentLogServiceImpl implements PriceAdjustmentLogService {
+    private final PriceAdjustmentLogRepository logRepository;
 
-    private final PriceAdjustmentLogRepository repository;
-
-    public PriceAdjustmentLogServiceImpl(PriceAdjustmentLogRepository repository) {
-        this.repository = repository;
+    public PriceAdjustmentLogServiceImpl(PriceAdjustmentLogRepository logRepository) {
+        this.logRepository = logRepository;
     }
 
-    public PriceAdjustmentLog create(PriceAdjustmentLog log) {
-        return repository.save(log);
+    @Override
+    public PriceAdjustmentLog logAdjustment(PriceAdjustmentLog log) {
+        return logRepository.save(log);
     }
 
-    public List<PriceAdjustmentLog> getAdjustmentsByEvent(long eventId) {
-        return repository.findByEventId(eventId);
+    @Override
+    public List<PriceAdjustmentLog> getAdjustmentsByEvent(Long eventId) {
+        return logRepository.findByEventId(eventId);
     }
 
-    public List<PriceAdjustmentLog> getAll() {
-        return repository.findAll();
+    @Override
+    public List<PriceAdjustmentLog> getAllAdjustments() {
+        return logRepository.findAll();
     }
 }
