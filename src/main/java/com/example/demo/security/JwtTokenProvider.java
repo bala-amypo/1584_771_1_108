@@ -1,15 +1,17 @@
-// src/main/java/com/example/demo/security/JwtTokenProvider.java
 package com.example.demo.security;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.security.core.Authentication;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
+import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
+import org.springframework.security.core.Authentication;
 
 public class JwtTokenProvider {
     private final String secret;
@@ -21,13 +23,15 @@ public class JwtTokenProvider {
         this.secret = secret;
         this.validityInMs = validityInMs;
         this.someFlag = someFlag;
-        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        this.key = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8),
+                                     SignatureAlgorithm.HS256.getJcaName());
     }
 
     public String generateToken(Authentication auth, Long userId, String role) {
         String email = auth.getName();
         Date now = new Date();
         Date exp = new Date(now.getTime() + validityInMs);
+
         return Jwts.builder()
                 .setSubject(email)
                 .claim("userId", userId)
@@ -35,13 +39,13 @@ public class JwtTokenProvider {
                 .claim("email", email)
                 .setIssuedAt(now)
                 .setExpiration(exp)
-                .signWith(key, SignatureAlgorithm.HS256)
+                .signWith(SignatureAlgorithm.HS256, key)
                 .compact();
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            Jwts.parser().setSigningKey(key).parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
@@ -49,17 +53,17 @@ public class JwtTokenProvider {
     }
 
     public String getUsernameFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build()
-                .parseClaimsJws(token).getBody().getSubject();
+        return Jwts.parser().setSigningKey(key)
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 
     public Map<String, Object> getAllClaims(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(key).build()
-                .parseClaimsJws(token).getBody();
-        Map<String, Object> map = new HashMap<>();
-        for (Map.Entry<String, Object> e : claims.entrySet()) {
-            map.put(e.getKey(), e.getValue());
-        }
+        Claims claims = Jwts.parser().setSigningKey(key)
+                .parseClaimsJws(token)
+                .getBody();
+        Map<String, Object> map = new HashMap<>(claims);
         map.put("sub", claims.getSubject());
         return map;
     }
