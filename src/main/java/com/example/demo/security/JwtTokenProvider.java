@@ -1,70 +1,73 @@
 package com.example.demo.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
 
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
-import java.util.Map;
 import java.util.HashMap;
-import org.springframework.security.core.Authentication;
+import java.util.Map;
 
+@Component
 public class JwtTokenProvider {
-    private final String secret;
-    private final long validityInMs;
-    private final boolean someFlag;
-    private final Key key;
+    private final String jwtSecret;
+    private final long jwtExpirationInMs;
 
-    public JwtTokenProvider(String secret, long validityInMs, boolean someFlag) {
-        this.secret = secret;
-        this.validityInMs = validityInMs;
-        this.someFlag = someFlag;
-        this.key = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8),
-                                     SignatureAlgorithm.HS256.getJcaName());
+    public JwtTokenProvider() {
+        this("DefaultSecretKeyMustBeLongerThan32Bytes123456", 3600000, true);
     }
 
-    public String generateToken(Authentication auth, Long userId, String role) {
-        String email = auth.getName();
-        Date now = new Date();
-        Date exp = new Date(now.getTime() + validityInMs);
+    public JwtTokenProvider(String jwtSecret, long jwtExpirationInMs, boolean someFlag) {
+        this.jwtSecret = jwtSecret;
+        this.jwtExpirationInMs = jwtExpirationInMs;
+    }
+
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+    }
+
+    // Method signature matching Test Case requirements
+    public String generateToken(Authentication authentication, Long userId, String role) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        claims.put("role", role);
+        claims.put("email", authentication.getName()); // Add email to claims for testing
 
         return Jwts.builder()
-                .setSubject(email)
-                .claim("userId", userId)
-                .claim("role", role)
-                .claim("email", email)
-                .setIssuedAt(now)
-                .setExpiration(exp)
-                .signWith(SignatureAlgorithm.HS256, key)
+                .setClaims(claims)
+                .setSubject(authentication.getName())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(new Date().getTime() + jwtExpirationInMs))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
 
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parser().setSigningKey(key).parseClaimsJws(token);
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
-        }
-    }
-
     public String getUsernameFromToken(String token) {
-        return Jwts.parser().setSigningKey(key)
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
     }
 
+    public boolean validateToken(String authToken) {
+        try {
+            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(authToken);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
     public Map<String, Object> getAllClaims(String token) {
-        Claims claims = Jwts.parser().setSigningKey(key)
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
                 .parseClaimsJws(token)
                 .getBody();
-        Map<String, Object> map = new HashMap<>(claims);
-        map.put("sub", claims.getSubject());
-        return map;
     }
 }

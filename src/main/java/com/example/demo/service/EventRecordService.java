@@ -1,8 +1,5 @@
-// src/main/java/com/example/demo/service/EventRecordService.java
 package com.example.demo.service;
-
 import com.example.demo.model.EventRecord;
-
 import java.util.List;
 import java.util.Optional;
 
