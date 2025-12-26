@@ -5,8 +5,10 @@ import com.example.demo.model.SeatInventoryRecord;
 import com.example.demo.repository.EventRecordRepository;
 import com.example.demo.repository.SeatInventoryRecordRepository;
 import com.example.demo.service.SeatInventoryService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Service
 public class SeatInventoryServiceImpl implements SeatInventoryService {
 
@@ -25,9 +27,10 @@ public class SeatInventoryServiceImpl implements SeatInventoryService {
 
         eventRepo.findById(inv.getEventId()).orElseThrow();
 
-        if (inv.getRemainingSeats() > inv.getTotalSeats())
+        if (inv.getRemainingSeats() > inv.getTotalSeats()) {
             throw new BadRequestException(
                     "Remaining seats cannot exceed total seats");
+        }
 
         return inventoryRepo.save(inv);
     }
@@ -36,9 +39,8 @@ public class SeatInventoryServiceImpl implements SeatInventoryService {
     public SeatInventoryRecord updateRemainingSeats(
             Long eventId, Integer remainingSeats) {
 
-        SeatInventoryRecord inv = inventoryRepo
-                .findByEventId(eventId)
-                .orElseThrow();
+        SeatInventoryRecord inv =
+                inventoryRepo.findByEventId(eventId).orElseThrow();
 
         inv.setRemainingSeats(remainingSeats);
         return inventoryRepo.save(inv);
