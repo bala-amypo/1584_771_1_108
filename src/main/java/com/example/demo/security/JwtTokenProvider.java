@@ -1,62 +1,66 @@
+// src/main/java/com/example/demo/security/JwtTokenProvider.java
 package com.example.demo.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.Authentication;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 public class JwtTokenProvider {
-
     private final String secret;
-    private final long expiration;
-    private final boolean debug;
+    private final long validityInMs;
+    private final boolean someFlag;
+    private final Key key;
 
-    // REQUIRED BY TEST
-    public JwtTokenProvider(String secret, long expiration, boolean debug) {
+    public JwtTokenProvider(String secret, long validityInMs, boolean someFlag) {
         this.secret = secret;
-        this.expiration = expiration;
-        this.debug = debug;
+        this.validityInMs = validityInMs;
+        this.someFlag = someFlag;
+        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    // REQUIRED BY TEST
-    public String generateToken(Authentication authentication, long userId, String role) {
+    public String generateToken(Authentication auth, Long userId, String role) {
+        String email = auth.getName();
+        Date now = new Date();
+        Date exp = new Date(now.getTime() + validityInMs);
         return Jwts.builder()
-                .setSubject(authentication.getName())
-                .addClaims(Map.of("userId", userId, "role", role))
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(SignatureAlgorithm.HS256, secret)
+                .setSubject(email)
+                .claim("userId", userId)
+                .claim("role", role)
+                .claim("email", email)
+                .setIssuedAt(now)
+                .setExpiration(exp)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // REQUIRED BY JwtAuthenticationFilter
     public boolean validateToken(String token) {
         try {
-            getAllClaims(token);
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
-        } catch (Exception e) {
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
 
-    // REQUIRED BY JwtAuthenticationFilter
-    public String getUsername(String token) {
-        return getAllClaims(token).getSubject();
-    }
-
-    // REQUIRED BY TEST
     public String getUsernameFromToken(String token) {
-        return getAllClaims(token).getSubject();
+        return Jwts.parserBuilder().setSigningKey(key).build()
+                .parseClaimsJws(token).getBody().getSubject();
     }
 
-    // REQUIRED BY TEST
-    public Claims getAllClaims(String token) {
-        return Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody();
+    public Map<String, Object> getAllClaims(String token) {
+        Claims claims = Jwts.parserBuilder().setSigningKey(key).build()
+                .parseClaimsJws(token).getBody();
+        Map<String, Object> map = new HashMap<>();
+        for (Map.Entry<String, Object> e : claims.entrySet()) {
+            map.put(e.getKey(), e.getValue());
+        }
+        map.put("sub", claims.getSubject());
+        return map;
     }
 }
