@@ -12,14 +12,31 @@ import java.util.Map;
 @Component
 public class JwtTokenProvider {
 
-    private final String SECRET =
-            "VerySecretKeyForJwtDemoApplication123456";
+    private String secret;
+    private long expiration;
+    private boolean enabled;
 
-    private final long EXPIRATION = 3600000; 
+    public JwtTokenProvider() {
+        this.secret = "VerySecretKeyForJwtDemoApplication123456";
+        this.expiration = 3600000; // 1 hour
+        this.enabled = true;
+    }
+
+    public JwtTokenProvider(String secret,
+                            long expiration,
+                            boolean enabled) {
+        this.secret = secret;
+        this.expiration = expiration;
+        this.enabled = enabled;
+    }
 
     public String generateToken(Authentication auth,
                                 Long userId,
                                 String role) {
+
+        if (!enabled) {
+            return null;
+        }
 
         return Jwts.builder()
                 .setSubject(auth.getName())
@@ -27,8 +44,8 @@ public class JwtTokenProvider {
                 .claim("role", role)
                 .claim("email", auth.getName())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
-                .signWith(SignatureAlgorithm.HS256, SECRET) 
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
     }
 
@@ -47,7 +64,7 @@ public class JwtTokenProvider {
 
     public Claims getAllClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(SECRET)
+                .setSigningKey(secret)
                 .parseClaimsJws(token)
                 .getBody();
     }
