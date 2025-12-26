@@ -4,39 +4,44 @@ import com.example.demo.model.EventRecord;
 import com.example.demo.repository.EventRecordRepository;
 import com.example.demo.service.EventRecordService;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EventRecordServiceImpl implements EventRecordService {
 
-    private final EventRecordRepository repository;
+    private final EventRecordRepository eventRepo;
 
-    public EventRecordServiceImpl(EventRecordRepository repository) {
-        this.repository = repository;
+    public EventRecordServiceImpl(EventRecordRepository eventRepo) {
+        this.eventRepo = eventRepo;
     }
 
+    @Override
     public EventRecord createEvent(EventRecord event) {
-        return repository.save(event);
+        return eventRepo.save(event);
     }
 
-    public EventRecord getEventById(long id) {
-        return repository.findById(id).orElse(null);
+    @Override
+    public Optional<EventRecord> getEventById(long id) {
+        return eventRepo.findById(id);
     }
 
-    public EventRecord getEventByCode(String code) {
-        return repository.findByEventCode(code).orElse(null);
+    @Override
+    public Optional<EventRecord> getEventByCode(String code) {
+        return eventRepo.findByEventCode(code);
     }
 
+    @Override
     public List<EventRecord> getAllEvents() {
-        return repository.findAll();
+        return eventRepo.findAll();
     }
 
+    @Override
     public EventRecord updateEventStatus(long id, boolean active) {
-        EventRecord event = getEventById(id);
-        if (event != null) {
-            event.setActive(active);
-            return repository.save(event);
-        }
-        return null;
+        EventRecord event = eventRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
+        event.setActive(active);
+        return eventRepo.save(event);
     }
 }

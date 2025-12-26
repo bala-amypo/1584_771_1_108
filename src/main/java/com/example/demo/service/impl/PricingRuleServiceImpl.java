@@ -4,31 +4,36 @@ import com.example.demo.model.PricingRule;
 import com.example.demo.repository.PricingRuleRepository;
 import com.example.demo.service.PricingRuleService;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
 public class PricingRuleServiceImpl implements PricingRuleService {
 
-    private final PricingRuleRepository repository;
+    private final PricingRuleRepository repo;
 
-    public PricingRuleServiceImpl(PricingRuleRepository repository) {
-        this.repository = repository;
+    public PricingRuleServiceImpl(PricingRuleRepository repo) {
+        this.repo = repo;
     }
 
+    @Override
     public PricingRule createRule(PricingRule rule) {
-        return repository.save(rule);
+        return repo.save(rule);
     }
 
+    @Override
     public PricingRule updateRule(long id, PricingRule rule) {
         rule.setId(id);
-        return repository.save(rule);
+        return repo.save(rule);
     }
 
-    public PricingRule getById(long id) {
-        return repository.findById(id).orElse(null);
-    }
-
+    @Override
     public List<PricingRule> getAllRules() {
-        return repository.findAll();
+        return repo.findAll();
+    }
+
+    @Override
+    public List<PricingRule> getActiveRules() {
+        return repo.findByActiveTrue();
     }
 }
