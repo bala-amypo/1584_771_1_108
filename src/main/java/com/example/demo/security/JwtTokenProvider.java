@@ -21,7 +21,6 @@ public class JwtTokenProvider {
         this.debug = debug;
     }
 
-    // REQUIRED by test
     public String generateToken(Authentication authentication, long userId, String role) {
         return Jwts.builder()
                 .setSubject(authentication.getName())
@@ -35,12 +34,10 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // REQUIRED by test
     public String getUsernameFromToken(String token) {
         return getAllClaims(token).getSubject();
     }
 
-    // REQUIRED by test
     public Claims getAllClaims(String token) {
         return Jwts.parser()
                 .setSigningKey(secret)
