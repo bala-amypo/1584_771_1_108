@@ -1,53 +1,46 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.EventRecord;
-import com.example.demo.service.EventRecordService;
+import com.example.demo.model.User;
+import com.example.demo.security.JwtTokenProvider;
+import com.example.demo.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
-import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/events")
-@SecurityRequirement(name = "bearerAuth")
+@RequestMapping("/auth")
+@SecurityRequirement(name = "bearerAuth") // lock appears
+public class AuthController {
 
-public class EventRecordController {
+    private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    private final EventRecordService service;
-
-    public EventRecordController(EventRecordService service) {
-        this.service = service;
+    public AuthController(UserService userService,
+                          JwtTokenProvider jwtTokenProvider) {
+        this.userService = userService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    @PostMapping
-    public EventRecord create(@RequestBody EventRecord event) {
-        return service.createEvent(event);
+    // 🔓 PUBLIC
+    @Operation(security = {})
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody User user) {
+        User savedUser = userService.register(user);
+        String token = jwtTokenProvider.generateToken(savedUser);
+        return ResponseEntity.ok(Map.of("token", token));
     }
 
-    @GetMapping("/{id}")
-    public EventRecord getById(@PathVariable Long id) {
-        return service.getEventById(id);
-    }
-
-    @GetMapping
-    public List<EventRecord> getAll() {
-        return service.getAllEvents();
-    }
-
-    @PutMapping("/{id}/status")
-    public EventRecord updateStatus(
-            @PathVariable Long id,
-            @RequestParam boolean active) {
-        return service.updateEventStatus(id, active);
-    }
-
-    @GetMapping("/lookup/{eventCode}")
-    public ResponseEntity<EventRecord> getByCode(
-            @PathVariable String eventCode) {
-
-        return service.getEventByCode(eventCode)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    // 🔓 PUBLIC
+    @Operation(security = {})
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
+        String token = userService.login(
+                request.get("email"),
+                request.get("password")
+        );
+        return ResponseEntity.ok(Map.of("token", token));
     }
 }
