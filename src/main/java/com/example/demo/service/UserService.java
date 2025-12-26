@@ -1,14 +1,8 @@
 package com.example.demo.service;
 
-import java.util.Map;
+import com.example.demo.model.User;
 
 public interface UserService {
-
-    // REQUIRED by AuthController
-    Map<String, Object> register(
-            String fullName,
-            String email,
-            String password,
-            String role
-    );
+    User save(User user);
+    User authenticate(String email, String password);
 }
