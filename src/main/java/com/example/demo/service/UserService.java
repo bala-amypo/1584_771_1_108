@@ -1,14 +1,14 @@
 package com.example.demo.service;
 
-import com.example.demo.model.User;
-
-import java.util.Optional;
+import java.util.Map;
 
 public interface UserService {
 
-    User save(User user);
-
-    Optional<User> findByEmail(String email);
-
-    boolean existsByEmail(String email);
+    // REQUIRED by AuthController
+    Map<String, Object> register(
+            String fullName,
+            String email,
+            String password,
+            String role
+    );
 }

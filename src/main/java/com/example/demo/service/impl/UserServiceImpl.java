@@ -6,7 +6,7 @@ import com.example.demo.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -21,18 +21,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User save(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
-    }
+    public Map<String, Object> register(String fullName,
+                                        String email,
+                                        String password,
+                                        String role) {
 
-    @Override
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
+        User user = new User();
+        user.setFullName(fullName);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRole(role);
 
-    @Override
-    public boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
+        userRepository.save(user);
+
+        return Map.of(
+                "message", "User registered successfully",
+                "email", email
+        );
     }
 }
