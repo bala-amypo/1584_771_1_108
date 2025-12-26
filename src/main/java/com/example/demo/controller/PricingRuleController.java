@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/pricing-rules")
+@RequestMapping("/rules")
 public class PricingRuleController {
 
     private final PricingRuleService service;
@@ -22,17 +22,22 @@ public class PricingRuleController {
     }
 
     @PutMapping("/{id}")
-    public PricingRule update(@PathVariable long id, @RequestBody PricingRule rule) {
+    public PricingRule update(@PathVariable Long id, @RequestBody PricingRule rule) {
         return service.updateRule(id, rule);
     }
 
     @GetMapping("/{id}")
-    public PricingRule getById(@PathVariable long id) {
-        return service.getById(id);
+    public PricingRule get(@PathVariable Long id) {
+        return service.getRuleById(id);
+    }
+
+    @GetMapping("/active")
+    public List<PricingRule> active() {
+        return service.getActiveRules();
     }
 
     @GetMapping
-    public List<PricingRule> getAll() {
+    public List<PricingRule> all() {
         return service.getAllRules();
     }
 }

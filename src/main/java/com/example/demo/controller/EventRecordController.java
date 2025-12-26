@@ -22,22 +22,22 @@ public class EventRecordController {
     }
 
     @GetMapping("/{id}")
-    public EventRecord getById(@PathVariable long id) {
+    public EventRecord get(@PathVariable Long id) {
         return service.getEventById(id);
     }
 
     @GetMapping
-    public List<EventRecord> getAll() {
+    public List<EventRecord> all() {
         return service.getAllEvents();
     }
 
     @PutMapping("/{id}/status")
-    public EventRecord updateStatus(@PathVariable long id, @RequestParam boolean active) {
+    public EventRecord update(@PathVariable Long id, @RequestParam boolean active) {
         return service.updateEventStatus(id, active);
     }
 
     @GetMapping("/code/{code}")
-    public EventRecord findByCode(@PathVariable String code) {
+    public EventRecord byCode(@PathVariable String code) {
         return service.getEventByCode(code);
     }
 }
