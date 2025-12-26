@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @OpenAPIDefinition(
     info = @Info(title = "Dynamic Event Ticket Pricing API", version = "v1"),
-    // FIX: Explicitly set the server URL to localhost:8080 to prevent redirect issues
     servers = {
         @Server(url = "https://9108.pro604cr.amypo.ai/", description = "Local Server")
     }
