@@ -13,24 +13,16 @@ import java.util.Map;
 public class AuthController {
 
     private final UserService userService;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProvider jwtProvider;
 
-    public AuthController(UserService userService,
-                          JwtTokenProvider jwtTokenProvider) {
+    public AuthController(UserService userService, JwtTokenProvider jwtProvider) {
         this.userService = userService;
-        this.jwtTokenProvider = jwtTokenProvider;
+        this.jwtProvider = jwtProvider;
     }
 
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody User user) {
-        return ResponseEntity.ok(
-                userService.register(
-                        user.getFullName(),
-                        user.getEmail(),
-                        user.getPassword(),
-                        user.getRole()
-                )
-        );
+        return ResponseEntity.ok(userService.save(user));
     }
 
     @GetMapping("/login")
@@ -38,10 +30,8 @@ public class AuthController {
             @RequestParam String email,
             @RequestParam String password) {
 
-        User user = userService.login(email, password);
-        String token = jwtTokenProvider.generateToken(
-                user.getEmail(), user.getRole()
-        );
+        User user = userService.authenticate(email, password);
+        String token = jwtProvider.generateToken(user.getEmail(), user.getRole());
 
         return ResponseEntity.ok(Map.of("token", token));
     }

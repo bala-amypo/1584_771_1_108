@@ -1,73 +1,51 @@
-package com.example.demo.security;
+package com.example.demo.config;
 
-import io.jsonwebtoken.*;
-import org.springframework.stereotype.Component;
+import com.example.demo.security.JwtAuthenticationFilter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.util.Date;
+@Configuration
+public class SecurityConfig {
 
-@Component
-public class JwtTokenProvider {
+    private final JwtAuthenticationFilter jwtFilter;
 
-    private final String secretKey;
-    private final long validityInMs;
-    private final boolean includeRole;
-
-    // ✅ REQUIRED by tests
-    public JwtTokenProvider(String secretKey, long validityInMs, boolean includeRole) {
-        this.secretKey = secretKey;
-        this.validityInMs = validityInMs;
-        this.includeRole = includeRole;
+    public SecurityConfig(JwtAuthenticationFilter jwtFilter) {
+        this.jwtFilter = jwtFilter;
     }
 
-    // ✅ Required for Spring
-    public JwtTokenProvider() {
-        this("mySecretKey123456", 3600000, true);
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/auth/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
     }
 
-    public String generateToken(String username, String role) {
-        Claims claims = Jwts.claims().setSubject(username);
-
-        if (includeRole) {
-            claims.put("role", role);
-        }
-
-        Date now = new Date();
-        Date expiry = new Date(now.getTime() + validityInMs);
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(expiry)
-                .signWith(SignatureAlgorithm.HS256, secretKey)
-                .compact();
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token);
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
-        }
-    }
-
-    public String getUsername(String token) {
-        return Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
-
-    public String getRole(String token) {
-        Object role = Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody()
-                .get("role");
-
-        return role != null ? role.toString() : null;
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 }
