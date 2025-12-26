@@ -13,7 +13,6 @@ import java.util.Map;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    // Simple in-memory storage for testing purposes as mocked in tests
     private Map<String, User> userMap = new HashMap<>();
 
     public Map<String, Object> registerUser(String fullName, String email, String password, String role) {

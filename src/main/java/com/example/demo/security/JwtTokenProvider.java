@@ -13,7 +13,6 @@ import java.util.Map;
 
 @Component
 public class JwtTokenProvider {
-    // Default key (used if not injected by test)
     private final String jwtSecret;
     private final long jwtExpirationInMs;
 
