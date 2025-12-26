@@ -12,9 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.PriceAdjustmentLog;
 import com.example.demo.service.PriceAdjustmentLogService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/adjustments")
+@SecurityRequirement(name = "bearerAuth")
+
 public class PriceAdjustmentLogController {
 
     private final PriceAdjustmentLogService service;

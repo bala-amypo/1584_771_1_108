@@ -10,12 +10,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import com.example.demo.model.PricingRule;
 import com.example.demo.service.PricingRuleService;
 
 @RestController
 @RequestMapping("/rules")
+@SecurityRequirement(name = "bearerAuth")
+
 public class PricingRuleController {
 
     private final PricingRuleService service;
