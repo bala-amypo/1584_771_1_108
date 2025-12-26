@@ -1,15 +1,18 @@
+// src/main/java/com/example/demo/controller/SeatInventoryController.java
 package com.example.demo.controller;
 
 import com.example.demo.model.SeatInventoryRecord;
 import com.example.demo.service.SeatInventoryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/inventory")
+@RequestMapping("/api/inventory")
+@Tag(name = "Inventory")
 public class SeatInventoryController {
-
     private final SeatInventoryService service;
 
     public SeatInventoryController(SeatInventoryService service) {
@@ -17,27 +20,26 @@ public class SeatInventoryController {
     }
 
     @PostMapping
-    public SeatInventoryRecord create(@RequestBody SeatInventoryRecord record) {
-        return service.createInventory(record);
+    @Operation(summary = "Create inventory")
+    public SeatInventoryRecord create(@RequestBody SeatInventoryRecord inv) {
+        return service.createInventory(inv);
     }
 
-    @PutMapping("/{eventId}")
-    public SeatInventoryRecord updateRemaining(
-            @PathVariable Long eventId,
-            @RequestParam int remaining) {
-
-        return service.updateRemaining(eventId, remaining)
-                .orElseThrow(() -> new RuntimeException("Inventory not found"));
+    @PutMapping("/{eventId}/remaining")
+    @Operation(summary = "Update remaining seats")
+    public SeatInventoryRecord update(@PathVariable Long eventId, @RequestParam Integer remaining) {
+        return service.updateRemainingSeats(eventId, remaining);
     }
 
-    @GetMapping("/{eventId}")
+    @GetMapping("/event/{eventId}")
+    @Operation(summary = "Get inventory by event id")
     public SeatInventoryRecord getByEvent(@PathVariable Long eventId) {
-        return service.getInventoryByEvent(eventId)
-                .orElseThrow(() -> new RuntimeException("Inventory not found"));
+        return service.getInventoryByEvent(eventId).orElse(null);
     }
 
     @GetMapping
+    @Operation(summary = "Get all inventories")
     public List<SeatInventoryRecord> getAll() {
-        return service.getAll();
+        return service.getAllInventories();
     }
 }
