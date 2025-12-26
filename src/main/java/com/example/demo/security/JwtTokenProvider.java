@@ -1,75 +1,73 @@
 package com.example.demo.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.security.core.Authentication;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
+import java.security.Key;
 import java.util.Date;
-import java.util.Map;
 
 @Component
 public class JwtTokenProvider {
 
-    private String secret;
-    private long expiration;
-    private boolean enabled;
+    private final Key secretKey;
+    private final long validityInMs;
+    private final boolean includeRole;
 
+    // ✅ REQUIRED by your tests
+    public JwtTokenProvider(String secret, long validityInMs, boolean includeRole) {
+        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
+        this.validityInMs = validityInMs;
+        this.includeRole = includeRole;
+    }
+
+    // ✅ Default constructor for Spring
     public JwtTokenProvider() {
-        this.secret = "VerySecretKeyForJwtDemoApplication123456";
-        this.expiration = 3600000; // 1 hour
-        this.enabled = true;
+        this("my-secret-key-my-secret-key-my-secret-key", 3600000, true);
     }
 
-    public JwtTokenProvider(String secret,
-                            long expiration,
-                            boolean enabled) {
-        this.secret = secret;
-        this.expiration = expiration;
-        this.enabled = enabled;
-    }
+    public String generateToken(String username, String role) {
+        Claims claims = Jwts.claims().setSubject(username);
 
-    public String generateToken(Authentication auth,
-                                Long userId,
-                                String role) {
-
-        if (!enabled) {
-            return null;
+        if (includeRole) {
+            claims.put("role", "ROLE_" + role);
         }
 
-        return Jwts.builder()
-                .setSubject(auth.getName())
-                .claim("userId", userId)
-                .claim("role", role)
-                .claim("email", auth.getName())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(SignatureAlgorithm.HS256, secret)
-                .compact();
-    }
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + validityInMs);
 
-    public String getUsernameFromToken(String token) {
-        return getAllClaims(token).getSubject();
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
     }
 
     public boolean validateToken(String token) {
         try {
-            getAllClaims(token);
+            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return true;
-        } catch (Exception e) {
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
 
-    public Claims getAllClaims(String token) {
+    public String getUsername(String token) {
         return Jwts.parser()
-                .setSigningKey(secret)
+                .setSigningKey(secretKey)
                 .parseClaimsJws(token)
-                .getBody();
+                .getBody()
+                .getSubject();
     }
 
-    public Map<String, Object> getAllClaimsAsMap(String token) {
-        return getAllClaims(token);
+    public String getRole(String token) {
+        Object role = Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role");
+
+        return role != null ? role.toString() : null;
     }
 }
