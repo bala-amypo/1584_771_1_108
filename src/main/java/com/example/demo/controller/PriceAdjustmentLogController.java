@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/price-adjustments")
+@RequestMapping("/price-adjustments")
 public class PriceAdjustmentLogController {
 
     private final PriceAdjustmentLogService service;
@@ -16,19 +16,9 @@ public class PriceAdjustmentLogController {
         this.service = service;
     }
 
-    @PostMapping
-    public PriceAdjustmentLog create(@RequestBody PriceAdjustmentLog log) {
-        return service.create(log);
-    }
-
     @GetMapping("/event/{eventId}")
-    public List<PriceAdjustmentLog> getByEvent(@PathVariable Long eventId) {
-        return service.getByEvent(eventId);
-    }
-
-    @GetMapping("/{id}")
-    public PriceAdjustmentLog getById(@PathVariable Long id) {
-        return service.getById(id);
+    public List<PriceAdjustmentLog> getByEvent(@PathVariable long eventId) {
+        return service.getAdjustmentsByEvent(eventId);
     }
 
     @GetMapping

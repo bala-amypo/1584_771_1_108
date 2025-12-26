@@ -18,28 +18,26 @@ public class EventRecordController {
 
     @PostMapping
     public EventRecord create(@RequestBody EventRecord event) {
-        return service.create(event);
+        return service.createEvent(event);
     }
 
     @GetMapping("/{id}")
-    public EventRecord getById(@PathVariable Long id) {
-        return service.getById(id);
+    public EventRecord getById(@PathVariable long id) {
+        return service.getEventById(id);
     }
 
     @GetMapping
     public List<EventRecord> getAll() {
-        return service.getAll();
+        return service.getAllEvents();
     }
 
     @PutMapping("/{id}/status")
-    public EventRecord updateStatus(
-            @PathVariable Long id,
-            @RequestParam boolean active) {
-        return service.updateStatus(id, active);
+    public EventRecord updateStatus(@PathVariable long id, @RequestParam boolean active) {
+        return service.updateEventStatus(id, active);
     }
 
-    @GetMapping("/lookup/{eventCode}")
-    public EventRecord findByCode(@PathVariable String eventCode) {
-        return service.findByCode(eventCode);
+    @GetMapping("/code/{code}")
+    public EventRecord findByCode(@PathVariable String code) {
+        return service.getEventByCode(code);
     }
 }
