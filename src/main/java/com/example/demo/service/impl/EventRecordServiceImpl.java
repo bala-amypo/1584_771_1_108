@@ -5,7 +5,7 @@ import com.example.demo.model.EventRecord;
 import com.example.demo.repository.EventRecordRepository;
 import com.example.demo.service.EventRecordService;
 import java.util.*;
-
+@Service
 public class EventRecordServiceImpl implements EventRecordService {
 
     private final EventRecordRepository repo;

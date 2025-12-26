@@ -4,6 +4,7 @@ import com.example.demo.model.User;
 import com.example.demo.security.JwtTokenProvider;
 import com.example.demo.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,20 +32,20 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> req) {
+    public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
 
-        String email = req.get("email");
-        String password = req.get("password");
+        String email = request.get("email");
+        String password = request.get("password");
 
         return userService.findByEmail(email)
-                .filter(u -> passwordEncoder.matches(password, u.getPassword()))
-                .map(u -> {
+                .filter(user -> passwordEncoder.matches(password, user.getPassword()))
+                .map(user -> {
                     String token = jwtTokenProvider.generateToken(
-                            new org.springframework.security.authentication
-                                    .UsernamePasswordAuthenticationToken(
-                                            u.getEmail(), null),
-                            u.getId(),
-                            u.getRole());
+                            new UsernamePasswordAuthenticationToken(
+                                    user.getEmail(), null),
+                            user.getId(),
+                            user.getRole()
+                    );
                     return ResponseEntity.ok(token);
                 })
                 .orElse(ResponseEntity.status(401).build());
