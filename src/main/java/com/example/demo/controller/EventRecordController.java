@@ -23,7 +23,7 @@ public class EventRecordController {
 
     @GetMapping("/{id}")
     public EventRecord getById(@PathVariable Long id) {
-        return service.getEventById(id).orElse(null);
+        return service.getEventById(id);
     }
 
     @GetMapping
@@ -36,11 +36,11 @@ public class EventRecordController {
             @PathVariable Long id,
             @RequestParam boolean active) {
 
-        return service.updateEventStatus(id, active).orElse(null);
+        return service.updateEventStatus(id, active);
     }
 
     @GetMapping("/code/{code}")
     public EventRecord getByCode(@PathVariable String code) {
-        return service.getEventByCode(code).orElse(null);
+        return service.getEventByCode(code);
     }
 }

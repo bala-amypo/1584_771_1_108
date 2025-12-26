@@ -26,12 +26,12 @@ public class SeatInventoryController {
             @PathVariable Long eventId,
             @RequestParam int remaining) {
 
-        return service.updateRemaining(eventId, remaining).orElse(null);
+        return service.updateRemaining(eventId, remaining);
     }
 
     @GetMapping("/{eventId}")
     public SeatInventoryRecord getByEvent(@PathVariable Long eventId) {
-        return service.getInventoryByEvent(eventId).orElse(null);
+        return service.getInventoryByEvent(eventId);
     }
 
     @GetMapping
