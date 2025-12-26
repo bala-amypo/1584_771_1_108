@@ -41,7 +41,6 @@ public class PricingRuleController {
         return ResponseEntity.ok(service.getById(id));
     }
 
-    // GET /api/pricing-rules – List all
     @GetMapping
     public ResponseEntity<List<PricingRule>> getAll() {
         return ResponseEntity.ok(service.getAll());

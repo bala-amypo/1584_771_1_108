@@ -19,14 +19,12 @@ public class SeatInventoryController {
         this.service = service;
     }
 
-    // POST /api/inventory – Create inventory
     @PostMapping
     public ResponseEntity<SeatInventoryRecord> create(
             @RequestBody SeatInventoryRecord record) {
         return ResponseEntity.ok(service.create(record));
     }
 
-    // PUT /api/inventory/{eventId}/remaining – Update seats
     @PutMapping("/{eventId}/remaining")
     public ResponseEntity<SeatInventoryRecord> updateRemaining(
             @PathVariable Long eventId,
@@ -34,14 +32,12 @@ public class SeatInventoryController {
         return ResponseEntity.ok(service.updateRemaining(eventId, remainingSeats));
     }
 
-    // GET /api/inventory/event/{eventId} – Get by event
     @GetMapping("/event/{eventId}")
     public ResponseEntity<SeatInventoryRecord> getByEvent(
             @PathVariable Long eventId) {
         return ResponseEntity.ok(service.getByEvent(eventId));
     }
 
-    // GET /api/inventory – List all
     @GetMapping
     public ResponseEntity<List<SeatInventoryRecord>> getAll() {
         return ResponseEntity.ok(service.getAll());
