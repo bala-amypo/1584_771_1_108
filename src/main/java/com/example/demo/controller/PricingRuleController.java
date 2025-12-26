@@ -20,11 +20,11 @@ public class PricingRuleController {
 
     @PostMapping
     public PricingRule create(@RequestBody PricingRule rule) {
-        return service.create(rule);
+        return service.createRule(rule);
     }
 
     @GetMapping("/active")
-    public List<PricingRule> getActiveRules() {
+    public List<PricingRule> getActive() {
         return service.getActiveRules();
     }
 }

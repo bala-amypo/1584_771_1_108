@@ -1,46 +1,30 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.User;
-import com.example.demo.security.JwtTokenProvider;
-import com.example.demo.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
+import com.example.demo.model.EventRecord;
+import com.example.demo.service.EventRecordService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import java.util.List;
 
 @RestController
-@RequestMapping("/auth")
-@SecurityRequirement(name = "bearerAuth") // lock appears
-public class AuthController {
+@RequestMapping("/events")
+@SecurityRequirement(name = "bearerAuth")
+public class EventRecordController {
 
-    private final UserService userService;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final EventRecordService service;
 
-    public AuthController(UserService userService,
-                          JwtTokenProvider jwtTokenProvider) {
-        this.userService = userService;
-        this.jwtTokenProvider = jwtTokenProvider;
+    public EventRecordController(EventRecordService service) {
+        this.service = service;
     }
 
-    // 🔓 PUBLIC
-    @Operation(security = {})
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
-        User savedUser = userService.register(user);
-        String token = jwtTokenProvider.generateToken(savedUser);
-        return ResponseEntity.ok(Map.of("token", token));
+    @PostMapping
+    public EventRecord create(@RequestBody EventRecord event) {
+        return service.createEvent(event);
     }
 
-    // 🔓 PUBLIC
-    @Operation(security = {})
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
-        String token = userService.login(
-                request.get("email"),
-                request.get("password")
-        );
-        return ResponseEntity.ok(Map.of("token", token));
+    @GetMapping
+    public List<EventRecord> getAll() {
+        return service.getAllEvents();
     }
 }

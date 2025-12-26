@@ -20,7 +20,7 @@ public class DynamicPricingController {
 
     @PostMapping("/compute/{eventId}")
     public DynamicPriceRecord compute(@PathVariable Long eventId) {
-        return service.computePrice(eventId);
+        return service.computeDynamicPrice(eventId);
     }
 
     @GetMapping("/history/{eventId}")

@@ -6,13 +6,15 @@ import com.example.demo.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
-@SecurityRequirement(name = "bearerAuth") // lock appears
+@SecurityRequirement(name = "bearerAuth")
 public class AuthController {
 
     private final UserService userService;
@@ -28,19 +30,35 @@ public class AuthController {
     @Operation(security = {})
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
-        User savedUser = userService.register(user);
-        String token = jwtTokenProvider.generateToken(savedUser);
-        return ResponseEntity.ok(Map.of("token", token));
+
+        Map<String, Object> result =
+                userService.registerUser(
+                        user.getFullName(),
+                        user.getEmail(),
+                        user.getPassword(),
+                        user.getRole()
+                );
+
+        return ResponseEntity.ok(result);
     }
 
     // 🔓 PUBLIC
     @Operation(security = {})
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
-        String token = userService.login(
-                request.get("email"),
-                request.get("password")
+
+        Authentication auth =
+                new UsernamePasswordAuthenticationToken(
+                        request.get("email"),
+                        request.get("password")
+                );
+
+        String token = jwtTokenProvider.generateToken(
+                auth,
+                1L,
+                "USER"
         );
+
         return ResponseEntity.ok(Map.of("token", token));
     }
 }
