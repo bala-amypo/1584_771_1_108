@@ -23,7 +23,8 @@ public class EventRecordController {
 
     @GetMapping("/{id}")
     public EventRecord getById(@PathVariable Long id) {
-        return service.getEventById(id);
+        return service.getEventById(id)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
     }
 
     @GetMapping
@@ -36,11 +37,13 @@ public class EventRecordController {
             @PathVariable Long id,
             @RequestParam boolean active) {
 
-        return service.updateEventStatus(id, active);
+        return service.updateEventStatus(id, active)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
     }
 
     @GetMapping("/code/{code}")
     public EventRecord getByCode(@PathVariable String code) {
-        return service.getEventByCode(code);
+        return service.getEventByCode(code)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
     }
 }
