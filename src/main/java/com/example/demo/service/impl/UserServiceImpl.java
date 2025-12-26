@@ -14,12 +14,10 @@ public class UserServiceImpl implements UserService {
         this.repository = repository;
     }
 
-    @Override
     public User save(User user) {
         return repository.save(user);
     }
 
-    @Override
     public User authenticate(String email, String password) {
         return repository.findByEmail(email).orElse(null);
     }
