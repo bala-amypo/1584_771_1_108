@@ -15,7 +15,7 @@ public class JwtTokenProvider {
     private final String jwtSecret;
     private final long jwtExpirationInMs;
     private final boolean includeEmailClaim;
-
+1
     public JwtTokenProvider() {
         
         this.jwtSecret = "VerySecretKeyForJwtDemoApplication123456";
