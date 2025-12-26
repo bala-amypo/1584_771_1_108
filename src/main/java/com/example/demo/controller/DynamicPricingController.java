@@ -27,4 +27,9 @@ public class DynamicPricingController {
     public List<DynamicPriceRecord> history(@PathVariable Long eventId) {
         return service.getPriceHistory(eventId);
     }
+
+    @GetMapping("/all")
+    public List<DynamicPriceRecord> allPrices() {
+        return service.getAllComputedPrices();
+    }
 }

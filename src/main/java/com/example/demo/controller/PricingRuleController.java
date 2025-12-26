@@ -19,12 +19,17 @@ public class PricingRuleController {
     }
 
     @PostMapping
-    public PricingRule create(@RequestBody PricingRule rule) {
+    public PricingRule createRule(@RequestBody PricingRule rule) {
         return service.createRule(rule);
     }
 
     @GetMapping("/active")
-    public List<PricingRule> getActive() {
+    public List<PricingRule> getActiveRules() {
         return service.getActiveRules();
+    }
+
+    @GetMapping
+    public List<PricingRule> getAllRules() {
+        return service.getAllRules();
     }
 }

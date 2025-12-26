@@ -17,12 +17,12 @@ public class SeatInventoryController {
     }
 
     @PostMapping
-    public SeatInventoryRecord create(@RequestBody SeatInventoryRecord record) {
+    public SeatInventoryRecord createInventory(@RequestBody SeatInventoryRecord record) {
         return service.createInventory(record);
     }
 
-    @GetMapping("/{eventId}")
-    public SeatInventoryRecord get(@PathVariable Long eventId) {
+    @GetMapping("/event/{eventId}")
+    public SeatInventoryRecord getByEvent(@PathVariable Long eventId) {
         return service.getInventoryByEvent(eventId);
     }
 }
