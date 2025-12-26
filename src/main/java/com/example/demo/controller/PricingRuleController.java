@@ -26,8 +26,6 @@ public class PricingRuleController {
 
     @PutMapping("/{id}")
     public ResponseEntity<PricingRule> updateRule(@PathVariable Long id, @RequestBody PricingRule rule) {
-        // Note: Logic to find and update would go here or in service
-        // Assuming creation logic for update in this simplified version
         rule.setId(id);
         return ResponseEntity.ok(service.createRule(rule));
     }
@@ -39,7 +37,6 @@ public class PricingRuleController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PricingRule> getRuleById(@PathVariable Long id) {
-        // Simplified: Fetch from all list or add getById to Service
         return service.getAllRules().stream()
                 .filter(r -> r.getId().equals(id))
                 .findFirst()

@@ -59,7 +59,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // FIX: This Bean allows the Swagger UI to make requests
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

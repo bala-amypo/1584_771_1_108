@@ -42,23 +42,11 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
-        // Authenticate using the mocked user details service logic
-        // In a real app, AuthenticationManager would be used here
-        userService.loadUserByUsername(authRequest.getEmail()); // Verify user exists
         
-        // Check password (simplified for this demo as user details are mocked)
-        // Ideally: authenticationManager.authenticate(...)
-
-        // Generate Token
-        // Fetch user details again to get ID and Role (mocked fetch)
-        // For the purpose of this test harness, we rely on the service returning the map or re-fetching
-        // Since CustomUserDetailsService in the previous step uses a Map, we assume valid creds if no exception
+        userService.loadUserByUsername(authRequest.getEmail()); 
         
-        // Create dummy auth object
         Authentication auth = new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword(), Collections.emptyList());
         
-        // We need the ID and Role. In a real DB scenario we'd fetch the User entity.
-        // Here we mock the ID as 1L and role as generic for simplicity unless fetched from a real DB
         Long userId = 1L; 
         String role = "USER"; 
 

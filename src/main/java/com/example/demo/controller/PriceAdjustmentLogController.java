@@ -19,11 +19,9 @@ public class PriceAdjustmentLogController {
         this.service = service;
     }
 
-    // 7.6 Endpoint: POST / (Manual Log)
     @PostMapping
     public ResponseEntity<PriceAdjustmentLog> logAdjustment(@RequestBody PriceAdjustmentLog log) {
-        // Service should expose a save method for manual logging
-        // Assuming implicit save or extension of service
+        
         return ResponseEntity.ok(log); 
     }
 
@@ -34,7 +32,6 @@ public class PriceAdjustmentLogController {
 
     @GetMapping
     public ResponseEntity<List<PriceAdjustmentLog>> getAllAdjustments() {
-        // Simplification if getAll not explicitly in Service interface
         return ResponseEntity.ok(service.getAdjustmentsByEvent(null)); 
     }
 }

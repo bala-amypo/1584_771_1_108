@@ -24,11 +24,8 @@ public class SeatInventoryController {
         return ResponseEntity.ok(service.createInventory(inventory));
     }
 
-    // Requirement 7.3: PUT /{eventId}/remaining
     @PutMapping("/{eventId}/remaining")
     public ResponseEntity<SeatInventoryRecord> updateRemainingSeats(@PathVariable Long eventId, @RequestBody Integer remainingSeats) {
-        // Implementation would require a service method updateRemainingSeats
-        // For now, we can fetch, update, and save using existing methods if specific service method missing
         SeatInventoryRecord inv = service.getInventoryByEvent(eventId);
         if (inv != null) {
             inv.setRemainingSeats(remainingSeats);
