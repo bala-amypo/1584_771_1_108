@@ -1,8 +1,6 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.exception.BadRequestException;
 import com.example.demo.model.SeatInventoryRecord;
-import com.example.demo.repository.EventRecordRepository;
 import com.example.demo.repository.SeatInventoryRecordRepository;
 import com.example.demo.service.SeatInventoryService;
 import org.springframework.stereotype.Service;
@@ -12,47 +10,34 @@ import java.util.List;
 @Service
 public class SeatInventoryServiceImpl implements SeatInventoryService {
 
-    private final SeatInventoryRecordRepository inventoryRepo;
-    private final EventRecordRepository eventRepo;
+    private final SeatInventoryRecordRepository repository;
 
-    public SeatInventoryServiceImpl(
-            SeatInventoryRecordRepository inventoryRepo,
-            EventRecordRepository eventRepo) {
-        this.inventoryRepo = inventoryRepo;
-        this.eventRepo = eventRepo;
+    public SeatInventoryServiceImpl(SeatInventoryRecordRepository repository) {
+        this.repository = repository;
     }
 
     @Override
-    public SeatInventoryRecord createInventory(SeatInventoryRecord inv) {
+    public SeatInventoryRecord create(SeatInventoryRecord record) {
+        return repository.save(record);
+    }
 
-        eventRepo.findById(inv.getEventId()).orElseThrow();
-
-        if (inv.getRemainingSeats() > inv.getTotalSeats()) {
-            throw new BadRequestException(
-                    "Remaining seats cannot exceed total seats");
+    @Override
+    public SeatInventoryRecord updateRemaining(Long eventId, int remainingSeats) {
+        SeatInventoryRecord record = repository.findByEventId(eventId).orElse(null);
+        if (record != null) {
+            record.setRemainingSeats(remainingSeats);
+            return repository.save(record);
         }
-
-        return inventoryRepo.save(inv);
+        return null;
     }
 
     @Override
-    public SeatInventoryRecord updateRemainingSeats(
-            Long eventId, Integer remainingSeats) {
-
-        SeatInventoryRecord inv =
-                inventoryRepo.findByEventId(eventId).orElseThrow();
-
-        inv.setRemainingSeats(remainingSeats);
-        return inventoryRepo.save(inv);
+    public SeatInventoryRecord getByEvent(Long eventId) {
+        return repository.findByEventId(eventId).orElse(null);
     }
 
     @Override
-    public SeatInventoryRecord getInventoryByEvent(Long eventId) {
-        return inventoryRepo.findByEventId(eventId).orElseThrow();
-    }
-
-    @Override
-    public List<SeatInventoryRecord> getAllInventories() {
-        return inventoryRepo.findAll();
+    public List<SeatInventoryRecord> getAll() {
+        return repository.findAll();
     }
 }

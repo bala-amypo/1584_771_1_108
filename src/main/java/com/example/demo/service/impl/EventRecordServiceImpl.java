@@ -1,13 +1,11 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.exception.BadRequestException;
 import com.example.demo.model.EventRecord;
 import com.example.demo.repository.EventRecordRepository;
 import com.example.demo.service.EventRecordService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class EventRecordServiceImpl implements EventRecordService {
@@ -19,38 +17,32 @@ public class EventRecordServiceImpl implements EventRecordService {
     }
 
     @Override
-    public EventRecord createEvent(EventRecord event) {
-
-        if (repository.existsByEventCode(event.getEventCode())) {
-            throw new BadRequestException("Event code already exists");
-        }
-
-        if (event.getBasePrice() == null || event.getBasePrice() <= 0) {
-            throw new BadRequestException("Base price must be > 0");
-        }
-
+    public EventRecord create(EventRecord event) {
         return repository.save(event);
     }
 
     @Override
-    public EventRecord getEventById(Long id) {
-        return repository.findById(id).orElseThrow();
+    public EventRecord getById(Long id) {
+        return repository.findById(id).orElse(null);
     }
 
     @Override
-    public Optional<EventRecord> getEventByCode(String eventCode) {
-        return repository.findByEventCode(eventCode);
-    }
-
-    @Override
-    public List<EventRecord> getAllEvents() {
+    public List<EventRecord> getAll() {
         return repository.findAll();
     }
 
     @Override
-    public EventRecord updateEventStatus(Long id, boolean active) {
-        EventRecord event = repository.findById(id).orElseThrow();
-        event.setActive(active);
-        return repository.save(event);
+    public EventRecord updateStatus(Long id, boolean active) {
+        EventRecord event = getById(id);
+        if (event != null) {
+            event.setActive(active);
+            return repository.save(event);
+        }
+        return null;
+    }
+
+    @Override
+    public EventRecord findByCode(String eventCode) {
+        return repository.findByEventCode(eventCode).orElse(null);
     }
 }

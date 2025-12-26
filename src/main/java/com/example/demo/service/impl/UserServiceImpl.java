@@ -3,40 +3,24 @@ package com.example.demo.service.impl;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final UserRepository repository;
 
-    public UserServiceImpl(UserRepository userRepository,
-                           PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
+    public UserServiceImpl(UserRepository repository) {
+        this.repository = repository;
     }
 
     @Override
-    public Map<String, Object> register(String fullName,
-                                        String email,
-                                        String password,
-                                        String role) {
+    public User save(User user) {
+        return repository.save(user);
+    }
 
-        User user = new User();
-        user.setFullName(fullName);
-        user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password));
-        user.setRole(role);
-
-        userRepository.save(user);
-
-        return Map.of(
-                "message", "User registered successfully",
-                "email", email
-        );
+    @Override
+    public User authenticate(String email, String password) {
+        return repository.findByEmail(email).orElse(null);
     }
 }

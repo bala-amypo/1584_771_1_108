@@ -1,12 +1,11 @@
 package com.example.demo.service.impl;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import com.example.demo.model.PriceAdjustmentLog;
 import com.example.demo.repository.PriceAdjustmentLogRepository;
 import com.example.demo.service.PriceAdjustmentLogService;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class PriceAdjustmentLogServiceImpl implements PriceAdjustmentLogService {
@@ -18,17 +17,22 @@ public class PriceAdjustmentLogServiceImpl implements PriceAdjustmentLogService 
     }
 
     @Override
-    public void logAdjustment(PriceAdjustmentLog log) {
-        repository.save(log);
+    public PriceAdjustmentLog create(PriceAdjustmentLog log) {
+        return repository.save(log);
     }
 
     @Override
-    public List<PriceAdjustmentLog> getAdjustmentsByEvent(Long eventId) {
+    public List<PriceAdjustmentLog> getByEvent(Long eventId) {
         return repository.findByEventId(eventId);
     }
 
     @Override
-    public List<PriceAdjustmentLog> getAllAdjustments() {
+    public PriceAdjustmentLog getById(Long id) {
+        return repository.findById(id).orElse(null);
+    }
+
+    @Override
+    public List<PriceAdjustmentLog> getAll() {
         return repository.findAll();
     }
 }
