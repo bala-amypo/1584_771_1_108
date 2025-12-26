@@ -31,24 +31,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String header = request.getHeader("Authorization");
 
         if (header != null && header.startsWith("Bearer ")) {
+
             String token = header.substring(7);
 
             if (jwtTokenProvider.validateToken(token)) {
-                String username = jwtTokenProvider.getUsername(token);
 
-                UsernamePasswordAuthenticationToken auth =
+                // ✅ CORRECT METHOD NAME
+                String username =
+                        jwtTokenProvider.getUsernameFromToken(token);
+
+                UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 username,
                                 null,
                                 Collections.emptyList()
                         );
 
-                auth.setDetails(
+                authentication.setDetails(
                         new WebAuthenticationDetailsSource()
-                                .buildDetails(request));
+                                .buildDetails(request)
+                );
 
                 SecurityContextHolder.getContext()
-                        .setAuthentication(auth);
+                        .setAuthentication(authentication);
             }
         }
 

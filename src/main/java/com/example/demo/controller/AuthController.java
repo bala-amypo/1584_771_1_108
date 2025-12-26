@@ -26,13 +26,12 @@ public class AuthController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    // 🔓 PUBLIC
     @Operation(security = {})
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
 
         Map<String, Object> result =
-                userService.registerUser(
+                userService.register(
                         user.getFullName(),
                         user.getEmail(),
                         user.getPassword(),
@@ -47,14 +46,14 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
 
-        Authentication auth =
+        Authentication authentication =
                 new UsernamePasswordAuthenticationToken(
                         request.get("email"),
                         request.get("password")
                 );
 
         String token = jwtTokenProvider.generateToken(
-                auth,
+                authentication,
                 1L,
                 "USER"
         );
