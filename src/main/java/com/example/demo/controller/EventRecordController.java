@@ -23,10 +23,8 @@ public class EventRecordController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EventRecord> getById(@PathVariable Long id) {
-        return service.getEventById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public EventRecord getById(@PathVariable Long id) {
+        return service.getEventById(id);
     }
 
     @GetMapping
@@ -35,19 +33,15 @@ public class EventRecordController {
     }
 
     @PutMapping("/{id}/status")
-    public ResponseEntity<EventRecord> updateStatus(
+    public EventRecord updateStatus(
             @PathVariable Long id,
             @RequestParam boolean active) {
 
-        return service.updateEventStatus(id, active)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return service.updateEventStatus(id, active);
     }
 
     @GetMapping("/code/{code}")
-    public ResponseEntity<EventRecord> getByCode(@PathVariable String code) {
-        return service.getEventByCode(code)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public EventRecord getByCode(@PathVariable String code) {
+        return service.getEventByCode(code);
     }
 }

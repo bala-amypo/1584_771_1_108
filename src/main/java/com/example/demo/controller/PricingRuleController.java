@@ -27,17 +27,17 @@ public class PricingRuleController {
     }
 
     @GetMapping("/{id}")
-    public PricingRule get(@PathVariable Long id) {
-        return service.getRuleById(id);
-    }
-
-    @GetMapping("/active")
-    public List<PricingRule> active() {
-        return service.getActiveRules();
+    public PricingRule getById(@PathVariable Long id) {
+        return service.getRuleById(id).orElse(null);
     }
 
     @GetMapping
-    public List<PricingRule> all() {
+    public List<PricingRule> getAll() {
         return service.getAllRules();
+    }
+
+    @GetMapping("/active")
+    public List<PricingRule> getActive() {
+        return service.getActiveRules();
     }
 }
