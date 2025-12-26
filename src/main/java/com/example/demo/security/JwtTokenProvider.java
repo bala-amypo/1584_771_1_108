@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Component
 public class JwtTokenProvider {
-    // Default key just in case, but tests inject their own
+    // Default key (used if not injected by test)
     private final String jwtSecret;
     private final long jwtExpirationInMs;
 
@@ -41,7 +41,7 @@ public class JwtTokenProvider {
                 .setSubject(authentication.getName())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + jwtExpirationInMs))
-                // FIX: Changed from HS512 to HS256 to support the test case's key length
+                // CRITICAL FIX: Changed HS512 -> HS256 to support the test case's 43-byte key
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256) 
                 .compact();
     }
