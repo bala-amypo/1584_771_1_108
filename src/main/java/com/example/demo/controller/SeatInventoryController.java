@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.model.SeatInventoryRecord;
 import com.example.demo.service.SeatInventoryService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,17 +23,24 @@ public class SeatInventoryController {
     }
 
     @PutMapping("/{eventId}")
-    public SeatInventoryRecord update(@PathVariable Long eventId, @RequestParam int remaining) {
-        return service.updateRemaining(eventId, remaining);
+    public ResponseEntity<SeatInventoryRecord> updateRemaining(
+            @PathVariable Long eventId,
+            @RequestParam int remaining) {
+
+        return service.updateRemaining(eventId, remaining)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{eventId}")
-    public SeatInventoryRecord byEvent(@PathVariable Long eventId) {
-        return service.getInventoryByEvent(eventId);
+    public ResponseEntity<SeatInventoryRecord> getByEvent(@PathVariable Long eventId) {
+        return service.getInventoryByEvent(eventId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping
-    public List<SeatInventoryRecord> all() {
+    public List<SeatInventoryRecord> getAll() {
         return service.getAll();
     }
 }
