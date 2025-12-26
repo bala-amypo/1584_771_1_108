@@ -17,32 +17,32 @@ public class EventRecordServiceImpl implements EventRecordService {
     }
 
     @Override
-    public EventRecord create(EventRecord event) {
+    public EventRecord createEvent(EventRecord event) {
         return repository.save(event);
     }
 
     @Override
-    public EventRecord getById(Long id) {
+    public EventRecord getEventById(long id) {
         return repository.findById(id).orElse(null);
     }
 
     @Override
-    public List<EventRecord> getAll() {
+    public EventRecord getEventByCode(String code) {
+        return repository.findByEventCode(code).orElse(null);
+    }
+
+    @Override
+    public List<EventRecord> getAllEvents() {
         return repository.findAll();
     }
 
     @Override
-    public EventRecord updateStatus(Long id, boolean active) {
-        EventRecord event = getById(id);
+    public EventRecord updateEventStatus(long id, boolean active) {
+        EventRecord event = getEventById(id);
         if (event != null) {
             event.setActive(active);
             return repository.save(event);
         }
         return null;
-    }
-
-    @Override
-    public EventRecord findByCode(String eventCode) {
-        return repository.findByEventCode(eventCode).orElse(null);
     }
 }
