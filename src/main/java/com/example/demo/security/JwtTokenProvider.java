@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.Map;
 
-@Component   // ✅ THIS IS THE FIX
+@Component   
 public class JwtTokenProvider {
 
     private final String jwtSecret;
@@ -17,7 +17,7 @@ public class JwtTokenProvider {
     private final boolean includeEmailClaim;
 
     public JwtTokenProvider() {
-        // default values for Spring Boot runtime
+        
         this.jwtSecret = "VerySecretKeyForJwtDemoApplication123456";
         this.jwtExpirationInMs = 3600000L; // 1 hour
         this.includeEmailClaim = true;
