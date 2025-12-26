@@ -3,33 +3,32 @@ package com.example.demo.security;
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
 import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
 
-    private final Key secretKey;
+    private final String secretKey;
     private final long validityInMs;
     private final boolean includeRole;
 
-    // ✅ REQUIRED by your tests
-    public JwtTokenProvider(String secret, long validityInMs, boolean includeRole) {
-        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
+    // ✅ REQUIRED by tests
+    public JwtTokenProvider(String secretKey, long validityInMs, boolean includeRole) {
+        this.secretKey = secretKey;
         this.validityInMs = validityInMs;
         this.includeRole = includeRole;
     }
 
-    // ✅ Default constructor for Spring
+    // ✅ Required for Spring
     public JwtTokenProvider() {
-        this("my-secret-key-my-secret-key-my-secret-key", 3600000, true);
+        this("mySecretKey123456", 3600000, true);
     }
 
     public String generateToken(String username, String role) {
         Claims claims = Jwts.claims().setSubject(username);
 
         if (includeRole) {
-            claims.put("role", "ROLE_" + role);
+            claims.put("role", role);
         }
 
         Date now = new Date();
@@ -45,7 +44,9 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
