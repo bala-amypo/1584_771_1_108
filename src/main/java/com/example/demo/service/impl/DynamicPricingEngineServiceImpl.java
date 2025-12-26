@@ -23,7 +23,9 @@ public class DynamicPricingEngineServiceImpl implements DynamicPricingEngineServ
 
     @Override
     public PriceAdjustmentLog getLatest(Long eventId) {
-        return repository.findTopByEventIdOrderByChangedAtDesc(eventId).orElse(null);
+        return repository
+                .findTopByEventIdOrderByChangedAtDesc(eventId)
+                .orElse(null);
     }
 
     @Override
