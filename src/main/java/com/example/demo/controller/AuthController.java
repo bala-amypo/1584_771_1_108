@@ -41,7 +41,6 @@ public class AuthController {
         return ResponseEntity.ok(result);
     }
 
-    // 🔓 PUBLIC
     @Operation(security = {})
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
