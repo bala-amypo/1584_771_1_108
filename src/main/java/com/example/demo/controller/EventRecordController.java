@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 import com.example.demo.model.EventRecord;
 import com.example.demo.service.EventRecordService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +23,7 @@ public class EventRecordController {
 
     @GetMapping("/{id}")
     public EventRecord getById(@PathVariable Long id) {
-        return service.getEventById(id);
+        return service.getEventById(id).orElse(null);
     }
 
     @GetMapping
@@ -37,11 +36,11 @@ public class EventRecordController {
             @PathVariable Long id,
             @RequestParam boolean active) {
 
-        return service.updateEventStatus(id, active);
+        return service.updateEventStatus(id, active).orElse(null);
     }
 
     @GetMapping("/code/{code}")
     public EventRecord getByCode(@PathVariable String code) {
-        return service.getEventByCode(code);
+        return service.getEventByCode(code).orElse(null);
     }
 }
