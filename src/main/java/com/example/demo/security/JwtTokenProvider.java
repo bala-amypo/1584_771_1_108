@@ -1,59 +1,72 @@
 package com.example.demo.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class JwtTokenProvider {
+    private final String jwtSecret;
+    private final long jwtExpirationInMs;
 
-    private final String secret;
-    private final long validityInMs;
-
-    // Required Constructor Signature [cite: 285-286]
     public JwtTokenProvider() {
-        this.secret = "VerySecretKeyForJwtDemoApplication123456";
-        this.validityInMs = 3600000L;
+        this("DefaultSecretKeyMustBeLongerThan32Bytes123456", 3600000, true);
     }
 
-    // Constructor required by the test suite 
-    public JwtTokenProvider(String secret, long validityInMs, boolean someFlag) {
-        this.secret = secret;
-        this.validityInMs = validityInMs;
+    public JwtTokenProvider(String jwtSecret, long jwtExpirationInMs, boolean someFlag) {
+        this.jwtSecret = jwtSecret;
+        this.jwtExpirationInMs = jwtExpirationInMs;
     }
 
-    public String generateToken(Long userId, String email, String role) {
-        Claims claims = Jwts.claims().setSubject(email);
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public String generateToken(Authentication authentication, Long userId, String role) {
+        Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("role", role);
-
-        Date now = new Date();
-        Date validity = new Date(now.getTime() + validityInMs);
+        claims.put("email", authentication.getName());
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(validity)
-                .signWith(SignatureAlgorithm.HS256, secret)
+                .setSubject(authentication.getName())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(new Date().getTime() + jwtExpirationInMs))
+                // CRITICAL FIX: Changed HS512 -> HS256 to support the test case's 43-byte key
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256) 
                 .compact();
     }
 
-    public boolean validateToken(String token) {
+    public String getUsernameFromToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
+
+    public boolean validateToken(String authToken) {
         try {
-            Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(authToken);
             return true;
-        } catch (Exception e) {
+        } catch (Exception ex) {
             return false;
         }
     }
 
-    // The method missing in your compilation error 
-    public Claims getClaimsFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(secret)
+    public Map<String, Object> getAllClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
                 .parseClaimsJws(token)
                 .getBody();
     }
