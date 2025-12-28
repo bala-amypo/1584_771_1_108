@@ -1,5 +1,6 @@
 package com.example.demo.security;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,7 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-@Component // Critical: Defines this class as a bean for SecurityConfig [cite: 315]
+@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -28,26 +29,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         
-        String authHeader = request.getHeader("Authorization"); // [cite: 302]
-        String token = null;
-        String username = null;
-
+        String authHeader = request.getHeader("Authorization"); [cite: 302]
+        
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
-            if (jwtTokenProvider.validateToken(token)) { // [cite: 303]
-                username = jwtTokenProvider.getClaimsFromToken(token).getSubject();
+            String token = authHeader.substring(7);
+            
+            if (jwtTokenProvider.validateToken(token)) { [cite: 303]
+                // Correctly calling the method defined in Provider
+                Claims claims = jwtTokenProvider.getClaimsFromToken(token); [cite: 304]
+                String email = claims.getSubject();
+                
+                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+                
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities()); [cite: 304]
+                
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication); [cite: 305]
             }
-        }
-
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities()); // [cite: 304]
-            
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            
-            SecurityContextHolder.getContext().setAuthentication(authentication); // [cite: 305]
         }
 
         filterChain.doFilter(request, response);
