@@ -34,23 +34,18 @@ public class DynamicPricingEngineServiceImpl implements DynamicPricingEngineServ
 
     @Override
     public DynamicPriceRecord computeDynamicPrice(Long eventId) {
-        // 1. Fetch Event
         EventRecord event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
-        // 2. Validate Active
         if (!Boolean.TRUE.equals(event.getActive())) {
             throw new BadRequestException("Event is not active");
         }
 
-        // 3. Fetch Inventory
         SeatInventoryRecord inventory = inventoryRepository.findByEventId(eventId)
                 .orElseThrow(() -> new RuntimeException("Seat inventory not found"));
 
-        // 4. Fetch Rules
         List<PricingRule> activeRules = ruleRepository.findByActiveTrue();
 
-        // 5. Apply Rules
         double multiplier = 1.0;
         String appliedRules = "";
         
@@ -78,7 +73,6 @@ public class DynamicPricingEngineServiceImpl implements DynamicPricingEngineServ
 
         double computedPrice = event.getBasePrice() * multiplier;
 
-        // 6. Check Previous Price and Log Adjustment
         Optional<DynamicPriceRecord> latest = priceRepository.findFirstByEventIdOrderByComputedAtDesc(eventId);
         if (latest.isPresent()) {
             double oldPrice = latest.get().getComputedPrice();
@@ -92,7 +86,6 @@ public class DynamicPricingEngineServiceImpl implements DynamicPricingEngineServ
             }
         }
 
-        // 7. Save Record
         DynamicPriceRecord record = new DynamicPriceRecord();
         record.setEventId(eventId);
         record.setComputedPrice(computedPrice);
